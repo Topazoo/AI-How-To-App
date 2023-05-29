@@ -6,16 +6,16 @@ import 'components/requirement_detail.dart';
 import 'components/section_title.dart';
 import 'components/step_detail.dart';
 
-class HowToGuideDetailPage extends StatefulWidget {
+class GuideDetailPage extends StatefulWidget {
   final Guide guide;
 
-  const HowToGuideDetailPage({Key? key, required this.guide}) : super(key: key);
+  const GuideDetailPage({Key? key, required this.guide}) : super(key: key);
 
   @override
-  HowToGuideDetailPageState createState() => HowToGuideDetailPageState();
+  GuideDetailPageState createState() => GuideDetailPageState();
 }
 
-class HowToGuideDetailPageState extends State<HowToGuideDetailPage> {
+class GuideDetailPageState extends State<GuideDetailPage> {
   List<bool> _stepChecklist = [];
   List<bool> _requirementChecklist = [];
 

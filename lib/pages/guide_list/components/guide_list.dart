@@ -4,33 +4,47 @@ import '../../../models/guide.dart';
 
 import '../../guide_detail_page/page.dart';
 
+import '../../../styles/theme.dart';
+
 class GuideList extends StatelessWidget {
   final List<Guide> recipes;
   final void Function(Guide recipe) onToggleFavorite;
 
-  const GuideList(this.recipes, this.onToggleFavorite, {super.key});
+  const GuideList(this.recipes, this.onToggleFavorite, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return ListView.separated(
       itemCount: recipes.length,
+      separatorBuilder: (context, index) => Divider(
+        color: AppTheme.darkTextColor, // This will create a line between each guide
+      ),
       itemBuilder: (BuildContext context, int index) {
         final recipe = recipes[index];
         return ListTile(
-          title: Text(recipe.title),
+          leading: Icon(
+            Icons.article_rounded, // Using article icon for guide
+            color: AppTheme.primaryIconColor,
+          ),
+          title: Text(
+            recipe.title,
+            style: TextStyle(
+              fontFamily: AppTheme.primaryFont,
+              color: AppTheme.darkTextColor,
+            ),
+          ),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => HowToGuideDetailPage(guide: recipes[index]),
+                builder: (context) => GuideDetailPage(guide: recipes[index]),
               ),
             );
           },
-          // Here we add the favorite button
           trailing: IconButton(
             icon: Icon(recipe.isFavorite ? Icons.favorite : Icons.favorite_border),
             onPressed: () => onToggleFavorite(recipe),
-            color: recipe.isFavorite ? Colors.red : null,
+            color: recipe.isFavorite ? Colors.red : AppTheme.secondaryIconColor,
           ),
         );
       },
