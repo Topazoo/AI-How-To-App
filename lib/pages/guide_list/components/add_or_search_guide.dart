@@ -1,9 +1,11 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 class AddOrSearchGuide extends StatefulWidget {
   final TextEditingController searchController;
   final Function(String) onAddGuide;
 
-  const AddOrSearchGuide({required this.searchController, required this.onAddGuide});
+  const AddOrSearchGuide({super.key, required this.searchController, required this.onAddGuide});
 
   @override
   _AddOrSearchGuideState createState() => _AddOrSearchGuideState();
