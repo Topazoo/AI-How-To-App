@@ -10,6 +10,8 @@ import 'components/add_or_search_guide.dart';
 import 'components/loading_guide_list.dart';
 import 'components/guide_list.dart';
 
+import '../../styles/theme.dart';
+
 class GuideListPage extends StatefulWidget {
   const GuideListPage({Key? key, required this.title}) : super(key: key);
 
@@ -138,37 +140,51 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        backgroundColor: AppTheme.primaryColor, // Adding primary color as AppBar background
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontFamily: AppTheme.primaryFont,
+            color: AppTheme.tabColor, // Set the AppBar title color to tab color
+          )
+        ),
+        elevation: 5, 
         bottom: TabBar(
           controller: _tabController,
+          indicatorColor: AppTheme.tabColor, 
+          labelColor: AppTheme.tabColor,
+          unselectedLabelColor: AppTheme.unselectedTabColor,
           tabs: const [
             Tab(icon: Icon(Icons.check_box), text: 'Guides'),
             Tab(icon: Icon(Icons.hourglass_empty), text: 'Loading Guides'),
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          Column(
-            children: [
-              AddOrSearchGuide(searchController: _searchController, onAddGuide: _addGuide),
-              Flexible(
-                child: GuideList(
-                  _searchTerm == ""
-                      ? _recipes.values.toList()
-                      : _recipes.values
-                          .where((recipe) =>
-                              recipe.title.toLowerCase().contains(_searchTerm.toLowerCase()))
-                          .toList(),
-                  _toggleFavorite,
+      body: Container(
+        color: AppTheme.lightBackgroundColor,
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            Column(
+              children: [
+                AddOrSearchGuide(searchController: _searchController, onAddGuide: _addGuide),
+                Flexible(
+                  child: GuideList(
+                    _searchTerm == ""
+                        ? _recipes.values.toList()
+                        : _recipes.values
+                            .where((recipe) =>
+                                recipe.title.toLowerCase().contains(_searchTerm.toLowerCase()))
+                            .toList(),
+                    _toggleFavorite,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          LoadingGuideList(_loadingGuides, retryLoadingGuide: _addGuide),
-        ],
-      ),
+              ],
+            ),
+            LoadingGuideList(_loadingGuides, retryLoadingGuide: _addGuide),
+          ],
+        ),
+      )
     );
   }
 }
