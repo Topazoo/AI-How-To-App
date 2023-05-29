@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/requirement.dart';
+import '../../../styles/theme.dart';
 
 class RequirementDetail extends StatelessWidget {
   final bool isChecked;
@@ -18,10 +19,12 @@ class RequirementDetail extends StatelessWidget {
           Checkbox(
             value: isChecked,
             onChanged: onChanged,
+            activeColor: AppTheme.primaryColor,
           ),
           Expanded(
             child: Text(
               '${requirement.quantity} ${requirement.item}',
+              style: TextStyle(color: AppTheme.darkTextColor, fontFamily: AppTheme.primaryFont),
             ),
           ),
         ],
