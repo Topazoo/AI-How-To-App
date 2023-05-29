@@ -6,9 +6,9 @@ import '../../utilities/guide_http_client.dart';
 import '../../models/guide.dart';
 import '../../models/loading_guide.dart';
 
-import 'components/add_guide_dialogue.dart';
+import 'components/add_or_search_guide.dart';
 import 'components/loading_guide_list.dart';
-import 'components/recipe_list.dart';
+import 'components/guide_list.dart';
 
 class GuideListPage extends StatefulWidget {
   const GuideListPage({Key? key, required this.title}) : super(key: key);
@@ -134,16 +134,6 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
     });
   }
 
-  void _showAddGuideDialog(BuildContext context) {
-    final TextEditingController textEditingController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AddGuideDialog(textEditingController, _addGuide);
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,40 +150,24 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
       body: TabBarView(
         controller: _tabController,
         children: [
-          Column(children: [
-            GestureDetector(
-              onTap: () {
-                FocusScope.of(context).unfocus(); // Unfocus the search field
-                setState(() {
-                  _searchTerm = _searchController.text;
-                });
-              },
-              child: TextField(
-                controller: _searchController,
-                decoration: const InputDecoration(
-                  labelText: "Search",
-                  fillColor: Colors.white,
-                  filled: true,
+          Column(
+            children: [
+              AddOrSearchGuide(searchController: _searchController, onAddGuide: _addGuide),
+              Flexible(
+                child: GuideList(
+                  _searchTerm == ""
+                      ? _recipes.values.toList()
+                      : _recipes.values
+                          .where((recipe) =>
+                              recipe.title.toLowerCase().contains(_searchTerm.toLowerCase()))
+                          .toList(),
+                  _toggleFavorite,
                 ),
               ),
-            ),
-            Flexible(child:
-              GuideList(_searchTerm == "" ? 
-                _recipes.values.toList() : 
-                _recipes.values.where((recipe) => recipe.title.toLowerCase().contains(_searchTerm.toLowerCase())).toList(),
-                _toggleFavorite
-              )
-            ),
-          ]),
+            ],
+          ),
           LoadingGuideList(_loadingGuides, retryLoadingGuide: _addGuide),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddGuideDialog(context);
-        },
-        tooltip: 'Add Guide',
-        child: const Icon(Icons.add),
       ),
     );
   }
