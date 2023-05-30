@@ -2,7 +2,7 @@ name: ai_how_to_app
 description: A How-To Guide App Powered by AI.
 publish_to: 'none'
 
-version: 1.0.5+1
+version: 1.0.6+1
 
 environment:
   sdk: '>=3.0.2 <4.0.0'
