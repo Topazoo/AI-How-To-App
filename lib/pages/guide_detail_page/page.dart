@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-
+import '../../../styles/theme.dart';
+import '../../../utilities/timer.dart';
+import '../../../utilities/time_parser/time_parser.dart';
 import '../../models/guide.dart';
-
 import 'components/requirement_detail.dart';
 import 'components/section_title.dart';
 import 'components/step_detail.dart';
-
-import '../../../styles/theme.dart';
 
 class GuideDetailPage extends StatefulWidget {
   final Guide guide;
@@ -20,15 +19,23 @@ class GuideDetailPage extends StatefulWidget {
 class GuideDetailPageState extends State<GuideDetailPage> {
   List<bool> _stepChecklist = [];
   List<bool> _requirementChecklist = [];
+  final Map<int, List<TimerWidget>> _timerWidgets = {};  // Hold the TimerWidgets here
 
   @override
   void initState() {
     super.initState();
     _stepChecklist = List<bool>.filled(widget.guide.steps.length, false);
     _requirementChecklist = List<bool>.filled(widget.guide.requirements.length, false);
+
+    for (int i = 0; i < widget.guide.steps.length; i++) {
+      List<int> durations = TimeParser.extractDurations(widget.guide.steps[i].instruction);
+      if (durations.isNotEmpty) {
+        _timerWidgets[i] = durations.map((duration) => TimerWidget(duration: duration)).toList();
+      }
+    }
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.lightBackgroundColor,
@@ -78,6 +85,7 @@ class GuideDetailPageState extends State<GuideDetailPage> {
               StepDetail(
                 step: widget.guide.steps[i],
                 isChecked: _stepChecklist[i],
+                timers: _timerWidgets[i] ?? [],  // Pass the list of TimerWidgets to StepDetail
                 onChanged: (bool? value) {
                   setState(() {
                     _stepChecklist[i] = value!;
