@@ -22,7 +22,7 @@ class GuideListPage extends StatefulWidget {
 }
 
 class _GuideListPageState extends State<GuideListPage> with SingleTickerProviderStateMixin {
-  Map<String, Guide> _recipes = {};
+  Map<String, Guide> _guides = {};
   final Map<String, Guide> _favoriteGuides = {};
   final List<LoadingGuide> _loadingGuides = [];
 
@@ -41,6 +41,13 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
         _searchTerm = _searchController.text;
       });
     });
+
+    // Add defaults
+    if (_guides.isEmpty) {
+      _addGuide("tie a tie");
+      _addGuide("do a kickflip");
+      _addGuide("clean dirty glassware");
+    }
   }
 
   @override
@@ -50,20 +57,20 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
     super.dispose();
   }
 
-  void _toggleFavorite(Guide recipe) {
+  void _toggleFavorite(Guide guides) {
       setState(() {
-          recipe.isFavorite = !recipe.isFavorite;
-          if (recipe.isFavorite) {
-              _favoriteGuides[recipe.title] = recipe;
+          guides.isFavorite = !guides.isFavorite;
+          if (guides.isFavorite) {
+              _favoriteGuides[guides.title] = guides;
           } else {
-              _favoriteGuides.remove(recipe.title);
+              _favoriteGuides.remove(guides.title);
           }
       });
       _sortGuides();
   }
 
   void _sortGuides() {
-      List<Guide> sortedGuides = _recipes.values.toList();
+      List<Guide> sortedGuides = _guides.values.toList();
       sortedGuides.sort((a, b) {
           if (a.isFavorite == b.isFavorite) {
               return a.title.compareTo(b.title);
@@ -72,33 +79,33 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
           }
       });
       setState(() {
-          _recipes = sortedGuides.asMap().map((index, value) => MapEntry(value.title, value));
+          _guides = sortedGuides.asMap().map((index, value) => MapEntry(value.title, value));
       });
   }
 
   Future<void> _addGuide(String title) async {
     GuideHTTPClient httpClient = GuideHTTPClient(guideTitle: title);
 
-    LoadingGuide recipe = _loadingGuides.firstWhere((r) => r.title == title, orElse: () => LoadingGuide(title: title, startTime: DateTime.now()));
-    recipe.status = LoadingStatus.loading;
+    LoadingGuide guides = _loadingGuides.firstWhere((r) => r.title == title, orElse: () => LoadingGuide(title: title, startTime: DateTime.now()));
+    guides.status = LoadingStatus.loading;
 
-    // Add to loading recipes
+    // Add to loading guidess
     setState(() {
-      _loadingGuides.remove(recipe);
-      _loadingGuides.add(recipe);
+      _loadingGuides.remove(guides);
+      _loadingGuides.add(guides);
     });
 
     // Switch to the "Loading" tab
     _tabController.animateTo(1);
 
-    // Try fetching the recipe immediately
+    // Try fetching the guides immediately
     httpClient.fetchGuide();
     if (await httpClient.guideExists()) {
-      final recipe = await httpClient.fetchGuide();
-      if (recipe != null) {
+      final guides = await httpClient.fetchGuide();
+      if (guides != null) {
         setState(() {
             _loadingGuides.removeWhere((r) => r.title == title);
-            _recipes[recipe.title] = recipe;
+            _guides[guides.title] = guides;
         });
         _sortGuides();
 
@@ -114,11 +121,11 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
     for (int i = 0; i < totalSeconds/delaySeconds; i++) {
       await Future.delayed(Duration(seconds: delaySeconds));
       if (await httpClient.guideExists()) {
-        final recipe = await httpClient.fetchGuide();
-        if (recipe != null) {
+        final guides = await httpClient.fetchGuide();
+        if (guides != null) {
           setState(() {
               _loadingGuides.removeWhere((r) => r.title == title);
-              _recipes[recipe.title] = recipe;
+              _guides[guides.title] = guides;
           });
           _sortGuides();
 
@@ -129,7 +136,7 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
       }
     }
 
-    // If the recipe still doesn't exist after 5 minutes, mark it as failed
+    // If the guides still doesn't exist after 5 minutes, mark it as failed
     setState(() {
       _loadingGuides.removeWhere((r) => r.title == title);
       _loadingGuides.add(LoadingGuide(title: title, startTime: DateTime.now(), status: LoadingStatus.failure));
@@ -171,10 +178,10 @@ class _GuideListPageState extends State<GuideListPage> with SingleTickerProvider
                 Flexible(
                   child: GuideList(
                     _searchTerm == ""
-                        ? _recipes.values.toList()
-                        : _recipes.values
-                            .where((recipe) =>
-                                recipe.title.toLowerCase().contains(_searchTerm.toLowerCase()))
+                        ? _guides.values.toList()
+                        : _guides.values
+                            .where((guides) =>
+                                guides.title.toLowerCase().contains(_searchTerm.toLowerCase()))
                             .toList(),
                     _toggleFavorite,
                   ),
